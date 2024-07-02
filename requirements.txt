@@ -1,0 +1,7 @@
+streamlit~=1.35.0
+langchain~=0.2.1
+python-dotenv~=1.0.1
+langchain-groq~=0.1.4
+langchain-community~=0.2.1
+faiss-cpu~=1.8.0
+langchain-google-genai~=1.0.6
