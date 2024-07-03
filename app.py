@@ -34,32 +34,40 @@ uploaded_file = st.sidebar.file_uploader("Upload your Log File here: ", type=["l
 temp_file_path = None
 if uploaded_file is not None:
     # Create a temporary file and write the uploaded file's content to it
-    with tempfile.NamedTemporaryFile(delete=False) as temp_file:
-        temp_file.write(uploaded_file.getvalue())
-        temp_file_path = temp_file.name
+    if "vectors" not in st.session_state:
+        with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+            temp_file.write(uploaded_file.getvalue())
+            temp_file_path = temp_file.name
+        # Just to check where it's being stored.
+        print(temp_file_path)
 
 
 def clear_cache():
     keys = list(st.session_state.keys())
     for key in keys:
         st.session_state.pop(key)
+    try:
+        os.remove("parsed_log_data.csv")
+        print("File deleted successfully")
+    except FileNotFoundError:
+        print("File not found")
 
 
 def file_loader():
     if "vectors" not in st.session_state:
-        # Splitting into smaller chunks.
 
         # If no parsing is needed
         if "not_log" in st.session_state:
             st.session_state.loader = TextLoader(file_path=temp_file_path)
-
         else:
-            st.session_state.loader = CSVLoader(file_path="./parsed_log_data.csv")
+            st.session_state.loader = CSVLoader(file_path="parsed_log_data.csv")
         st.session_state.log_file = st.session_state.loader.load()
 
         # Create a text splitter
         st.session_state.text_splitter = RecursiveCharacterTextSplitter(chunk_size=1024, chunk_overlap=60,
                                                                         length_function=len)
+
+        # Splitting into smaller chunks.
         split_logs = st.session_state.text_splitter.split_documents(st.session_state.log_file)
 
         # Unlink the temporary file after use.
@@ -67,9 +75,6 @@ def file_loader():
 
         try:
             # Converting into embeddings.
-            # st.session_state.embedding_model = OllamaEmbeddings(
-            #     model="nomic-embed-text:latest"
-            # )
             st.session_state.embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
 
             # Initializing the FAISS DB & storing the embeddings in it
@@ -90,6 +95,7 @@ prompt = ChatPromptTemplate.from_messages(
                    assumptions.
                    "Response Format:
                     Structure your responses clearly, using sections or bullet points for complex analyses.
+                    Include the log entry which supports your answer
                     Include relevant log messages when explaining your findings.
                     Clearly distinguish between information from logs, retrieved knowledge, and your own analysis.
                     Provide the final answer to the question first in bold.
@@ -101,10 +107,9 @@ prompt = ChatPromptTemplate.from_messages(
 )
 
 # Load Llama-3 LLM
-
 try:
     llm = ChatGroq(groq_api_key=groq_api_key,
-                    model_name="Llama3-70b-8192")
+                   model_name="Llama3-70b-8192")
 except Exception as e:
     st.warning("There was a problem with the Groq API. Please try again.")
 
@@ -112,6 +117,8 @@ except Exception as e:
 def vector_embeddings(llm):
     # Create a chain for LLM & Prompt Template to inject to LLM for inferencing
     document_chain = create_stuff_documents_chain(llm=llm, prompt=prompt)
+
+    # Creating a retriever to fetch top 2 chunks related to User_Prompt by making similarity search.
     retriever = st.session_state.vectors.as_retriever(search_kwargs={'k': 2})
 
     # Create a retrieval chain which links the retriever & document chain
@@ -147,23 +154,22 @@ if "vectors" not in st.session_state:
                 message.empty()
                 time.sleep(1)  # Clearing all temporary informative messages.
 
-
 if uploaded_file is not None and "vectors" in st.session_state:
     message_container = st.container(height=500, border=False)
     if user_prompt := st.chat_input("Enter your query: ", key="prompt_for_llm"):
         message_container.markdown(":orange[User Prompt: ]")
         message_container.write(user_prompt)
-        message_container.write(" ")
         with st.spinner("Generating response.."):
             start_time = time.time()
             response = st.session_state.retrieval_chain.invoke({"input": user_prompt})
-        st.sidebar.write("")
         st.sidebar.markdown("\n\n\n:green[Response Time : ]" + " " +
-                                    str(round((time.time() - start_time), 4)) + " sec.")
+                            str(round((time.time() - start_time), 2)) + " sec.")
         message_container.markdown(":blue[Response:]")
         message_container.write(response['answer'])
 
+# This block is to remove the chains, retrievers & embeddings from the session when user removes his log file.
 if uploaded_file is None:
     st.warning("Please upload your Log file before asking questions.")
     if "vectors" in st.session_state:
         clear_cache()
+
