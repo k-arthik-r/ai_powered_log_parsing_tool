@@ -116,7 +116,7 @@ All The Modules/Libraries Used in the Project can be installed using [requiremen
 
 ## Report
 
-The details Project Implementation is provided in [Project Report](project-report.pdf)
+The complete details of the Project Implementation is provided in [Project Report](project-report.pdf)
 
 ----------------------------
 
