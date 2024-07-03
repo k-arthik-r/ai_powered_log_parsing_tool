@@ -78,13 +78,24 @@ All The Modules/Libraries Used in the Project can be installed using [requiremen
   git clone https://github.com/k-arthik-r/ai_powered_log_parsing_tool.git
 ```
 
-- Navigate to the root Directory of the project and Create a python virtual environment, and activate it.
+- Navigate to the root Directory of the project and Create a python virtual environment.
   
 ```bash
   python -m venv venv
 
-  .\venv\Scripts\Activate.ps1
 ```
+- Activate the Environment:
+
+  - for Powershell
+
+  ```bash
+    .\venv\Scripts\Activate.ps1
+  ```
+  - for CommandPrompt
+
+  ```bash
+    .\venv\Scripts\activate.bat
+  ```
 
 - Install all the Modules Present in [requirements](requirements.txt)
   
