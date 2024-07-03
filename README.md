@@ -114,7 +114,14 @@ All The Modules/Libraries Used in the Project can be installed using [requiremen
 
 ----------------------------
 
+## Report
+
+The complete details of the Project Implementation is provided in [Project Report](project-report.pdf)
+
+----------------------------
+
 ## License
 
 [![Licence](https://img.shields.io/github/license/Ileriayo/markdown-badges?style=for-the-badge)](./LICENSE)
+
 
