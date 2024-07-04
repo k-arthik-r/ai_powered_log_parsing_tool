@@ -25,7 +25,7 @@ An advanced AI-powered solution enhances network diagnostics by leveraging large
 ------------------------
 
 ## Requirments
-Python 3.11 (Recommended) 
+Python 3.11.9 or Higher (Recommended) 
 
 <a href="https://www.python.org/downloads/" alt="python">
         <img src="https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54" /></a>
