@@ -116,6 +116,23 @@ All The Modules/Libraries Used in the Project can be installed using [requiremen
   streamlit run app.py
 ```
 
+## Using Docker
+
+- Start your Docker Engine.
+- Open your Terminal (Power shell or Comand Prompt).
+- Pull the Application Docker Image from the Docker Hub:
+  
+  ```bash
+  docker pull karthikclgid/ai-powered-log-parsing-tool:latest
+  ```
+  
+- Run the Docker Image:
+
+  ```bash
+  docker run -p 8501:8501 karthikclgid/ai-powered-log-parsing-tool:latest
+  ```
+  
+- The Application will start its Execution.
 
 -------------------------
 
